@@ -1,0 +1,34 @@
+<html>
+<head>
+<style>
+
+
+</style>
+</head>
+<body>
+	<img id = "recycle_viewer" style = "border: solid 1px black; width: 200px; height: 200px;" src = ""/>
+	<form action="/uploadPlasticPhoto" enctype="multipart/form-data" method="post">
+	    <input id = "recycle_image" type="file" name="recyclableimage">
+	    <input type="submit" value="Upload">
+  	</form>
+  	<script>
+		document.getElementById('recycle_image').addEventListener('change', function() {
+		      	if (this.files && this.files[0]) {
+		          	var img = document.getElementById('recycle_viewer');  // $('img')[0]
+		          	img.src = URL.createObjectURL(this.files[0]); // set src to file url
+		          	//recipeImage = img.src;
+		      	}
+			}
+		);
+  	</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+

@@ -1,0 +1,153 @@
+<html>
+<head>
+<style>
+#recycleTypeButton{
+	width:49%;
+	height:70px;
+	text-align: center;
+	background-color: lightgreen; 
+	display: inline-block;
+	border: 1px solid black;
+}
+#createEventButton{
+	width:49%;
+	height:70px;
+	text-align: center;
+	background-color: lightgreen;
+	display: inline-block;
+	border: 1px solid black;
+}
+#outter{
+	font-family:"Arial";
+	width: 800px;
+	margin: 0 auto;
+}
+.post{
+	border: 1px solid black;
+	padding:5px;
+	margin:10px;
+}
+ul {
+	list-style-type: none;
+}
+.progress_bar_outer{
+	height: 20px;
+	width: 300px;
+	border:1px solid black;
+}
+.progress_bar_inner{
+	height:20px;
+	background-color:green;
+}
+.alertBox{
+	color:red;
+}
+
+</style>
+
+</head>
+<body>
+<a id = "recycleTypeButton" href = "/recycleType">Recycle Type</a>
+<a id = "createEventButton" href = "/createEventCharity">Create Event</a>
+<div id = "outter">
+<ul id = "feed"></ul>
+<div id = "totalDonations">
+</div>
+</div>
+</body>
+<script type="text/javascript">
+	/*
+	title: {
+			type: String,
+			required: true
+		},
+		description: {
+			type: String,
+			required: true
+		},
+		totalDonations: {
+			type: Number,
+			required: true
+		},
+		targetDonations: {
+			type: Number,
+			required: true
+		},
+		related_org: {
+			type: String,
+			required: true
+		}
+	*/
+
+	function getPostElement(post_obj){
+		const li_div = document.createElement("li");
+		li_div.id = post_obj.title;
+		const div_container = document.createElement("div");
+		li_div.className = "innerPost";
+		div_container.className = "post";
+		const dollar_div = document.createElement("div");
+		dollar_div.innerHTML = "Total Donations: $<span>" + post_obj.totalDonations + "</span><br>Target: $" + post_obj.targetDonations;
+
+
+		var progress_bar_outer = document.createElement("div");
+		progress_bar_outer.className = "progress_bar_outer";
+		var progress_bar_inner = document.createElement("div");
+		progress_bar_inner.className = "progress_bar_inner";
+
+		const width_percent = (post_obj.totalDonations / post_obj.targetDonations) * 100;
+		console.log(width_percent);
+
+		progress_bar_inner.style = "width : " + width_percent + "%;";
+
+
+		const organization_div = document.createElement("div");
+		organization_div.innerHTML = post_obj.title + "<br>Description: " + post_obj.description;
+
+
+		const donateForm = document.createElement("form");
+		donateForm.method = "POST";
+		donateForm.action = "/donate";
+		const event_name = document.createElement("input");
+		event_name.type = "text";
+		event_name.name = "event_name"
+		event_name.value = post_obj.title;
+		event_name.style.display = "none";
+		const submit = document.createElement("input");
+		submit.type = "submit";
+		submit.value = "Donate";
+		donateForm.appendChild(event_name);
+		donateForm.appendChild(submit);
+		const alertBox = document.createElement("div");
+		alertBox.className = "alertBox";
+
+		div_container.appendChild(organization_div);
+		div_container.appendChild(dollar_div);
+
+		progress_bar_outer.appendChild(progress_bar_inner);
+
+		div_container.appendChild(progress_bar_outer);
+		div_container.appendChild(donateForm);
+		div_container.appendChild(alertBox);
+		li_div.appendChild(div_container);
+		return li_div;
+	}
+	const feed_div = document.getElementById("feed");
+
+	const postRequest = new XMLHttpRequest();
+	postRequest.open("POST","/getFeed");
+	//postRequest.setRequestHeader('Content-Type', 'application/json');
+	postRequest.onreadystatechange = function(){
+		if (this.readyState === 4 && this.status === 200){
+			const postArray = JSON.parse(postRequest.response);
+			for (let i = 0; i < postArray.length; i++){
+				var post_div = getPostElement(postArray[i]);
+				feed_div.appendChild(post_div);
+			}
+		}
+	}
+	postRequest.send();
+
+</script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/socketJS.js"></script>
+</html>
